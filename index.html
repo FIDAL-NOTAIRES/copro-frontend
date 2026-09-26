@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COPRO — FIDAL Notaires</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+  :root{
+    --nuit:#0F2238; --canard:#33838B; --orange:#FF982D; --carmin:#A01040; --cyan:#6DD5DC;
+    --jaune-forme:#FFE764; --jaune-texte:#FFC900;
+    --fond:#F6F8FA; --papier:#FFFFFF; --trait:#D9E1E8; --gris:#5B6B7A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fond);color:var(--nuit);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;font-size:14.5px;line-height:1.45}
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:normal;margin:0}
+  button,input,select{font:inherit;color:inherit}
+  a{color:var(--canard)}
+  :focus-visible{outline:2px solid var(--canard);outline-offset:2px}
+
+  header{background:var(--nuit);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header h1{font-size:22px;letter-spacing:.5px}
+  header .sous{color:var(--cyan);font-size:13px;flex:1;min-width:180px}
+  .btn-drive{background:transparent;border:1px solid var(--cyan);color:#fff;border-radius:4px;padding:6px 12px;cursor:pointer}
+  .btn-drive.ok{border-color:#7FD08A}
+  .btn-drive.alerte{border-color:var(--orange);color:var(--orange)}
+
+  main{max-width:1080px;margin:0 auto;padding:18px 16px 60px;display:grid;gap:16px}
+  section{background:var(--papier);border:1px solid var(--trait);border-radius:6px;padding:16px 18px}
+  section>h2{font-size:18px;margin-bottom:10px;padding-left:10px;border-left:4px solid var(--canard)}
+  .aide{color:var(--gris);font-size:13px;margin:0 0 10px}
+  .ligne{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input[type=text],input[type=date],select{border:1px solid var(--trait);border-radius:4px;padding:6px 8px;background:#fff}
+  input[type=text].large{flex:1;min-width:260px}
+  .btn{background:var(--canard);color:#fff;border:0;border-radius:4px;padding:7px 14px;cursor:pointer}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn.second{background:#fff;color:var(--canard);border:1px solid var(--canard)}
+  .btn.petit{padding:3px 9px;font-size:13px}
+  .lien-dossier{font-family:Georgia,serif;font-size:15px}
+
+  .depot{border:2px dashed var(--trait);border-radius:6px;padding:22px;text-align:center;color:var(--gris);cursor:pointer;margin-bottom:12px}
+  .depot.survol{border-color:var(--canard);background:#EEF7F8;color:var(--nuit)}
+  .depot b{color:var(--nuit);font-family:Georgia,serif;font-weight:normal;font-size:15px}
+
+  table{width:100%;border-collapse:collapse}
+  .tableau{overflow-x:auto}
+  th{text-align:left;font-weight:600;font-size:12.5px;color:var(--gris);border-bottom:1px solid var(--trait);padding:6px 6px}
+  td{border-bottom:1px solid #EEF1F4;padding:6px 6px;vertical-align:middle}
+  td.nom{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  tr.famille td{background:#F0F4F7;font-family:Georgia,serif;font-size:14px;color:var(--nuit);border-bottom:1px solid var(--trait)}
+  .source{font-size:12px;color:var(--gris)}
+  .source.claude{color:var(--canard)}
+  .vide{color:var(--gris);font-style:italic;padding:8px 0}
+
+  .alertes{display:grid;gap:6px;margin-bottom:12px}
+  .alerte{border-left:6px solid var(--jaune-forme);background:#FFFBE0;padding:7px 10px;border-radius:0 4px 4px 0}
+  .alerte.orange{border-left-color:var(--orange);background:#FFF3E6}
+  .alerte.rouge{border-left-color:var(--carmin);background:#FBEAF0}
+  .aucune{color:var(--gris)}
+  .statut{font-size:13px}
+  .statut.ouvert{color:var(--carmin)}
+  .statut.definitif{color:var(--canard)}
+  .statut.inconnu{color:#8A6D00}
+
+  .voyants{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin-bottom:6px}
+  .voyant{display:flex;align-items:center;gap:8px;border:1px solid var(--trait);border-radius:6px;padding:8px 12px;background:#fff;min-width:170px}
+  .voyant.general{border-width:2px;font-family:Georgia,serif;font-size:15px}
+  .pastille{width:16px;height:16px;border-radius:50%;flex:none;background:#C7D0D8}
+  .pastille.vert{background:#2E9E5B}.pastille.orange{background:var(--orange)}.pastille.rouge{background:var(--carmin)}
+  .voyant small{display:block;color:var(--gris);font-size:12px}
+  .restitution h3{font-size:17px;margin:18px 0 8px;color:var(--nuit)}
+  .restitution h4{font-family:Georgia,serif;font-weight:normal;font-size:15px;margin:14px 0 6px;color:var(--canard)}
+  .restitution p{margin:0 0 8px;max-width:78ch}
+  .restitution dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0 0 8px}
+  .restitution dt{color:var(--gris)}
+  .zone{border-left:3px solid var(--trait);padding:2px 0 2px 10px;margin:0 0 10px}
+  .zone.attention{border-left-color:var(--orange)}.zone.alerte{border-left-color:var(--carmin)}
+  .zone .ref{color:var(--gris);font-size:12.5px}
+  .progres{color:var(--gris);font-size:13px;margin-left:8px}
+  #messages{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:grid;gap:6px;z-index:10;width:min(560px,92vw)}
+  .msg{background:var(--nuit);color:#fff;padding:9px 14px;border-radius:4px;font-size:13.5px}
+  .msg.erreur{background:var(--carmin)}
+  .cache{display:none}
+  @media (max-width:640px){ td.nom{max-width:140px} main{padding:12px 8px 60px} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<header>
+  <h1>COPRO</h1>
+  <div class="sous" id="sous-titre">Analyse de la copropriété et des lots</div>
+  <button class="btn-drive" id="btn-drive" type="button">Connecter le Drive</button>
+</header>
+
+<main>
+  <section id="sec-dossier">
+    <h2>Dossier client</h2>
+    <p class="aide">Collez le lien du dossier client sur le Drive. COPRO y range les pièces dans un sous-dossier « Copropriété », créé s'il n'existe pas.</p>
+    <div class="ligne">
+      <input type="text" class="large" id="champ-dossier" placeholder="https://drive.google.com/drive/folders/…">
+      <button class="btn" id="btn-ouvrir" type="button">Ouvrir le dossier</button>
+    </div>
+    <p id="dossier-ouvert" class="cache"></p>
+  </section>
+
+  <section id="sec-pieces" class="cache">
+    <h2>Pièces</h2>
+    <div class="depot" id="depot" tabindex="0" role="button" aria-label="Déposer des pièces">
+      <b>Déposez ici les pièces de la copropriété</b><br>
+      règlement et modificatifs, procès-verbaux, appels de fonds, état daté, carnet d'entretien, diagnostics, contrats…
+      <input type="file" id="choix-fichiers" multiple accept=".pdf,application/pdf" class="cache">
+    </div>
+    <div class="tableau"><table id="table-pieces"></table></div>
+  </section>
+
+  <section id="sec-lots" class="cache">
+    <h2>Lots et date de vente</h2>
+    <p class="aide">Les lots analysés. La restitution traitera d'abord la copropriété, puis chaque lot.</p>
+    <div class="tableau"><table id="table-lots"></table></div>
+    <div class="ligne" style="margin:8px 0 16px"><button class="btn second petit" id="btn-ajout-lot" type="button">Ajouter un lot</button></div>
+    <div class="ligne">
+      <label for="date-vente">Date de vente</label>
+      <input type="date" id="date-vente">
+      <button class="btn second petit" id="btn-chercher-vente" type="button">Chercher dans le dossier client</button>
+      <span class="source" id="origine-vente"></span>
+    </div>
+    <div class="ligne" style="margin-top:8px">
+      <label for="date-promesse">Date de la promesse</label>
+      <input type="date" id="date-promesse">
+      <span class="source">pivot de la charge des travaux votés entre promesse et vente</span>
+    </div>
+  </section>
+
+  <section id="sec-controles" class="cache">
+    <h2>Contrôles</h2>
+    <div class="alertes" id="alertes"></div>
+    <h3 style="font-size:15px;margin:6px 0 8px">Assemblées générales déposées</h3>
+    <p class="aide">Délai de contestation de deux mois à compter de la notification du procès-verbal (article 42 de la loi du 10 juillet 1965). Saisissez la date de notification quand elle est connue.</p>
+    <div class="tableau"><table id="table-ag"></table></div>
+  </section>
+  <section id="sec-interlocuteurs" class="cache">
+    <h2>Interlocuteurs et demande de pièces</h2>
+    <p class="aide">Le vendeur ou son notaire, destinataire en premier rang de la demande de pièces. COPRO prépare le courriel et ouvre la messagerie ; rien ne part sans vous.</p>
+    <div class="ligne">
+      <input type="text" id="interloc-nom" placeholder="Nom (vendeur ou notaire du vendeur)" style="min-width:240px">
+      <input type="text" id="interloc-courriel" placeholder="Courriel" style="min-width:240px">
+      <button class="btn" id="btn-demande" type="button">Préparer la demande de pièces</button>
+    </div>
+  </section>
+
+  <section id="sec-analyse" class="cache">
+    <h2>Analyse</h2>
+    <p class="aide">COPRO lit les vingt zones ciblées du règlement, chaque procès-verbal et les pièces financières. Seules les pièces non encore analysées partent, sauf si vous relancez tout. Le coût estimé s'affiche avant tout envoi.</p>
+    <div class="ligne">
+      <button class="btn" id="btn-analyser" type="button">Analyser les nouvelles pièces</button>
+      <button class="btn second" id="btn-tout-analyser" type="button">Tout relancer</button>
+      <label for="seuil-impayes" style="margin-left:12px">Seuil d'impayés</label>
+      <input type="text" id="seuil-impayes" style="width:60px"> <span>% du budget annuel</span>
+      <span class="progres" id="progres"></span>
+    </div>
+  </section>
+
+  <section id="sec-voyant" class="cache">
+    <h2>Voyant de vigilance</h2>
+    <div class="voyants" id="voyants"></div>
+    <p class="aide" id="voyant-regle"></p>
+  </section>
+
+  <section id="sec-restitution" class="cache restitution">
+    <h2>Restitution</h2>
+    <div class="ligne" style="margin-bottom:10px">
+      <button class="btn" data-sortie="word-interne" type="button">Word, version interne</button>
+      <button class="btn" data-sortie="word-client" type="button">Word, version client</button>
+      <button class="btn second" data-sortie="pdf-interne" type="button">PDF, version interne</button>
+      <button class="btn second" data-sortie="pdf-client" type="button">PDF, version client</button>
+    </div>
+    <div id="restitution"></div>
+  </section>
+</main>
+<div id="messages" aria-live="polite"></div>
+
+<script type="module">
+/* ============================================================
+   COPRO — lots 1, 2 et première partie du lot 3 (26/09/2026)
+   Socle : dossier client sur le Drive, dépôt et qualification des
+   pièces, lots, date de vente, série des procès-verbaux et délai
+   de contestation. L'état du dossier est conservé dans le Drive,
+   fichier « copro_etat.json » du sous-dossier « Copropriété ».
+   Le lot 2 portera l'analyse (vingt zones du règlement, procès-
+   verbaux, appels de fonds) et le voyant de vigilance ; le lot 3
+   la restitution Word/PDF et les branchements.
+   ============================================================ */
+
+const OAUTH_CLIENT_ID = "82507767087-kr2q7r67r2m4llj6ftldgr4rc2n24gbu.apps.googleusercontent.com"; // même client que FUSION et TRENTE
+const OAUTH_SCOPE = "https://www.googleapis.com/auth/drive";
+const NOM_SOUS_DOSSIER = "Copropriété";
+const NOM_ETAT = "copro_etat.json";
+const MOIS_CONTESTATION = 2;
+
+// Codes de pièces. L'ordre est celui de l'affichage.
+const TYPES = {
+  RCP:  {libelle:"Règlement de copropriété / état descriptif"},
+  RCPM: {libelle:"Modificatif du règlement"},
+  PVAG: {libelle:"Procès-verbal d'assemblée générale"},
+  AF:   {libelle:"Appel de fonds"},
+  EDA:  {libelle:"État daté ou pré-état daté"},
+  IMP:  {libelle:"Impayés de charges (mise en demeure, relance)"},
+  CE:   {libelle:"Carnet d'entretien"},
+  DTG:  {libelle:"Diagnostic technique global"},
+  DPC:  {libelle:"Diagnostic des parties communes"},
+  BUD:  {libelle:"Budget prévisionnel ou comptes approuvés"},
+  FSC:  {libelle:"Fiche synthétique"},
+  CTR:  {libelle:"Contrat du syndicat"},
+  EHF:  {libelle:"État hypothécaire"},
+  AQ:   {libelle:"À qualifier"}
+};
+
+const etat = {
+  drive:{token:null, expire:0, client:null},
+  dossier:null,          // {id, nom, lien, coproId, etatId}
+  pieces:[],             // {id, nom, lien, type, date, dateAssemblee, citees[], notification, source, sansTexte}
+  lots:[],               // {numero, designation}
+  vente:{date:null, origine:null, promesse:null},
+  interlocuteurs:{nom:"", courriel:""},
+  analyse:{reglement:null, pieces:{}, seuilImpayes:15}   // pieces : résultat par identifiant Drive
+};
+
+/* ---------- utilitaires ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sansAccent = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function signaler(texte, erreur){
+  const d = document.createElement("div"); d.className = "msg" + (erreur ? " erreur" : ""); d.textContent = texte;
+  $("messages").appendChild(d); setTimeout(() => d.remove(), erreur ? 9000 : 4500);
+}
+function isoDepuisDate(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function dateDepuisISO(s){ if(!s) return null; const [a,m,j] = s.split("-").map(Number); return new Date(a, m-1, j); }
+function isoDepuisFr(s){ const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s || ""); return m ? m[3] + "-" + m[2] + "-" + m[1] : null; }
+function frDepuisISO(s){ const d = dateDepuisISO(s); return d ? d.toLocaleDateString("fr-FR", {day:"numeric", month:"long", year:"numeric"}) : "—"; }
+function ajouterMois(d, n){ const r = new Date(d); const j = r.getDate(); r.setMonth(r.getMonth() + n); if(r.getDate() < j) r.setDate(0); return r; }
+function aujourdhui(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+
+/* ---------- connexion Google (modèle FUSION) ---------- */
+function preparerOAuth(){
+  if(typeof google === "undefined" || !google.accounts){ setTimeout(preparerOAuth, 300); return; }
+  etat.drive.client = google.accounts.oauth2.initTokenClient({
+    client_id: OAUTH_CLIENT_ID, scope: OAUTH_SCOPE,
+    callback: r => {
+      if(r && r.access_token){
+        etat.drive.token = r.access_token;
+        etat.drive.expire = Date.now() + (Number(r.expires_in || 3600) - 60) * 1000;
+        majBoutonDrive("Drive connecté", "ok");
+      }else majBoutonDrive("Drive : accès refusé", "alerte");
+    },
+    error_callback: e => {
+      majBoutonDrive("Drive : échec", "alerte");
+      signaler("Connexion Google impossible. Vérifier que l'origine " + location.origin + " est autorisée sur le client OAuth « FIDAL - Apps ».", true);
+    }
+  });
+}
+function majBoutonDrive(texte, classe){ const b = $("btn-drive"); b.textContent = texte; b.className = "btn-drive" + (classe ? " " + classe : ""); }
+const driveConnecte = () => Boolean(etat.drive.token) && Date.now() < etat.drive.expire;
+function exigerDrive(){
+  if(driveConnecte()) return true;
+  signaler("Connectez d'abord le Drive (bouton en haut à droite).", true);
+  if(etat.drive.client) etat.drive.client.requestAccessToken();
+  return false;
+}
+async function driveFetch(url, options){
+  const o = Object.assign({}, options || {});
+  o.headers = Object.assign({Authorization: "Bearer " + etat.drive.token}, o.headers || {});
+  const r = await fetch(url, o);
+  if(r.status === 401){ etat.drive.token = null; majBoutonDrive("Drive : reconnecter", "alerte"); throw new Error("Session Google expirée — reconnectez le Drive"); }
+  if(!r.ok){ let m = "HTTP " + r.status; try{ const j = await r.json(); m = (j.error && j.error.message) || m; }catch(e){} throw new Error("Drive : " + m); }
+  return r;
+}
+const DRIVE = "https://www.googleapis.com/drive/v3/files";
+const OPT = "supportsAllDrives=true&includeItemsFromAllDrives=true";
+async function driveInfos(id){ return (await driveFetch(DRIVE + "/" + id + "?supportsAllDrives=true&fields=id,name,mimeType,webViewLink")).json(); }
+async function driveEnfants(parent, filtre){
+  const q = "'" + parent + "' in parents and trashed = false" + (filtre ? " and " + filtre : "");
+  let tous = [], jeton = null;
+  do{
+    const u = DRIVE + "?q=" + encodeURIComponent(q) + "&fields=nextPageToken,files(id,name,mimeType,webViewLink,modifiedTime)&pageSize=200&" + OPT + (jeton ? "&pageToken=" + jeton : "");
+    const j = await (await driveFetch(u)).json();
+    tous = tous.concat(j.files || []); jeton = j.nextPageToken;
+  }while(jeton);
+  return tous;
+}
+async function driveAssurerDossier(nom, parent){
+  const trouves = await driveEnfants(parent, "mimeType = 'application/vnd.google-apps.folder' and name = '" + nom.replace(/'/g, "\\'") + "'");
+  if(trouves.length) return trouves[0].id;
+  const r = await driveFetch(DRIVE + "?supportsAllDrives=true&fields=id", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({name: nom, mimeType: "application/vnd.google-apps.folder", parents:[parent]})});
+  return (await r.json()).id;
+}
+async function driveEnvoyer(blob, nom, parent, type){
+  const corps = new FormData();
+  corps.append("metadata", new Blob([JSON.stringify({name: nom, parents:[parent]})], {type:"application/json"}));
+  corps.append("file", blob, nom);
+  const r = await driveFetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,webViewLink", {method:"POST", body: corps});
+  return r.json();
+}
+async function driveRemplacer(id, blob){
+  await driveFetch("https://www.googleapis.com/upload/drive/v3/files/" + id + "?uploadType=media&supportsAllDrives=true", {method:"PATCH", body: blob});
+}
+async function driveRenommer(id, nom){
+  await driveFetch(DRIVE + "/" + id + "?supportsAllDrives=true", {method:"PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({name: nom})});
+}
+async function driveTelecharger(id){ return (await driveFetch(DRIVE + "/" + id + "?alt=media&supportsAllDrives=true")).blob(); }
+
+/* ---------- lecture des PDF (pdf.js, comme FUSION) ---------- */
+let pdfjsPromesse = null;
+function chargerPdfjs(){
+  if(!pdfjsPromesse) pdfjsPromesse = import("https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.mjs").then(m => {
+    m.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs"; return m;
+  });
+  return pdfjsPromesse;
+}
+async function textePdf(blob, maxPages){
+  try{
+    const pdfjs = await chargerPdfjs();
+    const doc = await pdfjs.getDocument({data: await blob.arrayBuffer()}).promise;
+    const n = Math.min(doc.numPages, maxPages);
+    let texte = "";
+    for(let i = 1; i <= n; i++){ const c = await (await doc.getPage(i)).getTextContent(); texte += c.items.map(x => x.str).join(" ") + "\n"; }
+    return {texte, pages: doc.numPages};
+  }catch(e){ return {texte:"", pages:0}; }
+}
+async function imagesPdf(blob, nb){
+  const pdfjs = await chargerPdfjs();
+  const doc = await pdfjs.getDocument({data: await blob.arrayBuffer()}).promise;
+  const out = [];
+  for(let i = 1; i <= Math.min(nb, doc.numPages); i++){
+    const page = await doc.getPage(i);
+    const vue = page.getViewport({scale: 1.6});
+    const c = document.createElement("canvas"); c.width = vue.width; c.height = vue.height;
+    await page.render({canvasContext: c.getContext("2d"), viewport: vue}).promise;
+    out.push({numero: i, image: c.toDataURL("image/jpeg", 0.8)});
+  }
+  return out;
+}
+
+/* ---------- dates et qualification par le code ---------- */
+const MOIS = {janvier:1,fevrier:2,mars:3,avril:4,mai:5,juin:6,juillet:7,aout:8,septembre:9,octobre:10,novembre:11,decembre:12};
+function datesDans(texte){
+  const t = sansAccent(texte).toLowerCase(), out = [];
+  let m;
+  const re1 = /(\b[0-3]?\d)[\/.\-]([01]?\d)[\/.\-]((?:19|20)\d\d)\b/g;
+  while((m = re1.exec(t))){ const d = new Date(+m[3], +m[2]-1, +m[1]); if(!isNaN(d) && +m[2] >= 1 && +m[2] <= 12) out.push({d, i: m.index}); }
+  const re2 = /\b(1er|[0-3]?\d)\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)\s+((?:19|20)\d\d)\b/g;
+  while((m = re2.exec(t))){ out.push({d: new Date(+m[3], MOIS[m[2]]-1, m[1] === "1er" ? 1 : +m[1]), i: m.index}); }
+  return out.sort((a, b) => a.i - b.i);
+}
+function qualifierParTexte(nom, texte){
+  const t = sansAccent(texte).toLowerCase(), n = sansAccent(nom).toLowerCase();
+  const s = {RCP:0,RCPM:0,PVAG:0,AF:0,EDA:0,IMP:0,CE:0,DTG:0,DPC:0,BUD:0,FSC:0,CTR:0,EHF:0};
+  if(/etat hypothecaire|releve des formalites|service de la publicite fonciere|fichier immobilier/.test(t)) s.EHF += 4;
+  if(/reglement de copropriete|etat descriptif de division/.test(t)) s.RCP += 3;
+  if(/modificatif|modification du reglement|modifiant l.etat descriptif/.test(t) && s.RCP) s.RCPM += 4;
+  if(/proces.verbal de l.assemblee generale|assemblee generale (ordinaire|extraordinaire|annuelle)?.{0,40}coproprietaires/.test(t)) s.PVAG += 3;
+  if(/resolution n|resolution no|majorite de l.article (24|25|26)/.test(t)) s.PVAG += 2;
+  if(/appel de fonds|appel de charges|avis d.appel|appel provisionnel/.test(t)) s.AF += 3;
+  if(/etat date|pre.etat date|article 5 du decret/.test(t)) s.EDA += 4;
+  if(/mise en demeure|injonction de payer|commandement de payer|relance.{0,40}impaye|charges impayees/.test(t)) s.IMP += 3;
+  if(/carnet d.entretien/.test(t)) s.CE += 4;
+  if(/diagnostic technique global/.test(t)) s.DTG += 4;
+  if(/dossier technique amiante|reperage (de l.)?amiante|constat de risque d.exposition au plomb|parties communes.{0,60}(amiante|plomb|termite)/.test(t)) s.DPC += 3;
+  if(/budget previsionnel|comptes de l.exercice|approbation des comptes|annexe n?.?1.{0,40}etat financier/.test(t)) s.BUD += 2;
+  if(/fiche synthetique/.test(t)) s.FSC += 4;
+  if(/contrat (d.entretien|de maintenance|de gardiennage|d.exploitation de chauffage)|ascensoriste/.test(t)) s.CTR += 3;
+  // indices par le nom du fichier
+  [["RCP",/reglement|rcp|edd/],["PVAG",/pv|proces|assemblee|\bag\b/],["AF",/appel/],["EDA",/etat.?date/],["CE",/carnet/],["DTG",/dtg/],["FSC",/fiche/],["CTR",/contrat/]]
+    .forEach(([k, re]) => { if(re.test(n)) s[k] += 1; });
+  let type = "AQ", max = 0;
+  for(const k in s) if(s[k] > max){ max = s[k]; type = k; }
+  if(max < 2) type = "AQ";
+  const dates = datesDans(texte);
+  let date = dates.length ? isoDepuisDate(dates[0].d) : null, dateAssemblee = null, citees = [];
+  if(type === "PVAG"){ dateAssemblee = dateAssembleeTenue(texte) || date; date = dateAssemblee; citees = assembleesCitees(texte, dateAssemblee); }
+  return {type, date, dateAssemblee, citees};
+}
+// Date de l'assemblée tenue : la première date dans les 600 premiers signes suivant « assemblée générale ».
+function dateAssembleeTenue(texte){
+  const t = sansAccent(texte).toLowerCase();
+  const i = t.search(/assemblee generale/);
+  if(i < 0) return null;
+  const d = datesDans(texte.slice(i, i + 600));
+  return d.length ? isoDepuisDate(d[0].d) : null;
+}
+// Autres assemblées citées : « assemblée générale … du <date> » ailleurs dans le texte.
+function assembleesCitees(texte, propre){
+  const t = sansAccent(texte).toLowerCase(), out = new Set();
+  const re = /assemblee generale[^.]{0,80}?\b(du|en date du|tenue le)\s+/g;
+  let m;
+  while((m = re.exec(t))){
+    const d = datesDans(texte.slice(m.index + m[0].length, m.index + m[0].length + 30));
+    if(d.length && d[0].i < 3){ const iso = isoDepuisDate(d[0].d); if(iso !== propre) out.add(iso); }
+  }
+  return [...out];
+}
+
+/* ---------- nommage ---------- */
+function nomPiece(p, ext){
+  const d = (p.type === "PVAG" ? p.dateAssemblee : p.date) || "";
+  const base = "COPRO_" + p.type + (d ? "_" + d.replace(/-/g, "") : "");
+  let nom = base + ext, k = 2;
+  while(etat.pieces.some(x => x !== p && x.nom === nom)) nom = base + "_" + (k++) + ext;
+  return nom;
+}
+const extension = nom => (/\.[a-z0-9]{2,5}$/i.exec(nom) || [".pdf"])[0].toLowerCase();
+
+/* ---------- état conservé dans le Drive ---------- */
+let minuterie = null;
+function enregistrer(){
+  clearTimeout(minuterie);
+  minuterie = setTimeout(async () => {
+    if(!etat.dossier || !driveConnecte()) return;
+    const contenu = {version:2, maj: new Date().toISOString(), pieces: etat.pieces, lots: etat.lots, vente: etat.vente, interlocuteurs: etat.interlocuteurs, analyse: etat.analyse};
+    const blob = new Blob([JSON.stringify(contenu, null, 1)], {type:"application/json"});
+    try{
+      if(etat.dossier.etatId) await driveRemplacer(etat.dossier.etatId, blob);
+      else etat.dossier.etatId = (await driveEnvoyer(blob, NOM_ETAT, etat.dossier.coproId)).id;
+    }catch(e){ signaler("Enregistrement impossible : " + e.message, true); }
+  }, 800);
+}
+
+/* ---------- ouverture du dossier client ---------- */
+function idDepuisLien(v){
+  const s = String(v || "").trim();
+  const m = /\/folders\/([\w-]{10,})/.exec(s) || /[?&]id=([\w-]{10,})/.exec(s);
+  return m ? m[1] : (/^[\w-]{10,}$/.test(s) ? s : null);
+}
+async function ouvrirDossier(){
+  if(!exigerDrive()) return;
+  const id = idDepuisLien($("champ-dossier").value);
+  if(!id){ signaler("Lien de dossier Drive non reconnu.", true); return; }
+  try{
+    const info = await driveInfos(id);
+    if(info.mimeType !== "application/vnd.google-apps.folder"){ signaler("Ce lien ne désigne pas un dossier.", true); return; }
+    const coproId = await driveAssurerDossier(NOM_SOUS_DOSSIER, id);
+    etat.dossier = {id, nom: info.name, lien: info.webViewLink, coproId, etatId: null};
+    etat.pieces = []; etat.lots = []; etat.vente = {date:null, origine:null}; etat.analyse = {reglement:null, pieces:{}, seuilImpayes:15}; etat.interlocuteurs = {nom:"", courriel:""};
+    const fichiers = await driveEnfants(coproId);
+    const fEtat = fichiers.find(f => f.name === NOM_ETAT);
+    if(fEtat){
+      etat.dossier.etatId = fEtat.id;
+      try{
+        const j = JSON.parse(await (await driveTelecharger(fEtat.id)).text());
+        etat.pieces = j.pieces || []; etat.lots = j.lots || []; etat.vente = j.vente || etat.vente;
+        if(j.analyse) etat.analyse = Object.assign(etat.analyse, j.analyse);
+        if(j.interlocuteurs) etat.interlocuteurs = j.interlocuteurs;
+      }catch(e){ signaler("État enregistré illisible, reprise depuis les fichiers.", true); }
+    }
+    // Pièces présentes dans le sous-dossier mais inconnues de l'état (déposées à la main dans le Drive) : on les lit.
+    const connues = new Set(etat.pieces.map(p => p.id));
+    etat.pieces = etat.pieces.filter(p => fichiers.some(f => f.id === p.id));   // fichiers supprimés du Drive : retirés
+    const nouvelles = fichiers.filter(f => f.name !== NOM_ETAT && f.mimeType !== "application/vnd.google-apps.folder" && !connues.has(f.id));
+    for(const f of nouvelles){
+      const blob = await driveTelecharger(f.id);
+      await integrer(blob, f, false);
+    }
+    $("sous-titre").textContent = info.name;
+    $("dossier-ouvert").className = "";
+    $("dossier-ouvert").innerHTML = 'Dossier ouvert : <a class="lien-dossier" href="' + esc(info.webViewLink) + '" target="_blank" rel="noopener">' + esc(info.name) + '</a>';
+    ["sec-pieces","sec-lots","sec-interlocuteurs","sec-controles","sec-analyse","sec-voyant","sec-restitution"].forEach(s => $(s).classList.remove("cache"));
+    rendre();
+    if(nouvelles.length) enregistrer();
+  }catch(e){ signaler(e.message, true); }
+}
+
+/* ---------- dépôt ---------- */
+async function integrer(blob, fichierDrive, renommer){
+  const lecture = await textePdf(blob, 40);
+  const sansTexte = lecture.texte.replace(/\s/g, "").length < 200;
+  const q = sansTexte ? {type:"AQ", date:null, dateAssemblee:null, citees:[]} : qualifierParTexte(fichierDrive.name, lecture.texte);
+  const p = {id: fichierDrive.id, nom: fichierDrive.name, lien: fichierDrive.webViewLink, type: q.type, date: q.date,
+    dateAssemblee: q.dateAssemblee, citees: q.citees, notification: null, source: sansTexte ? "à lire" : "code", sansTexte, pages: lecture.pages};
+  etat.pieces.push(p);
+  if(renommer && p.type !== "AQ"){
+    const nom = nomPiece(p, extension(fichierDrive.name));
+    try{ await driveRenommer(p.id, nom); p.nom = nom; }catch(e){}
+  }
+  return p;
+}
+async function deposer(liste){
+  if(!exigerDrive() || !etat.dossier) return;
+  for(const f of liste){
+    try{
+      signaler("Dépôt de " + f.name + "…");
+      const envoye = await driveEnvoyer(f, f.name, etat.dossier.coproId);
+      await integrer(f, envoye, true);
+      rendre(); enregistrer();
+    }catch(e){ signaler(f.name + " : " + e.message, true); }
+  }
+}
+
+/* ---------- lecture d'image (pièces sans couche de texte) ---------- */
+async function lireImage(p){
+  if(!exigerDrive()) return;
+  try{
+    const est = await (await fetch("/api/analyse", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({action:"estimer", jeton: etat.drive.token})})).json();
+    if(!est.configure || !est.autorise){ signaler("Lecture d'image indisponible : " + (est.motif || "configuration incomplète"), true); return; }
+    const nb = Math.min(est.pagesMax || 3, p.pages || 3);
+    const cout = (nb * est.coutPageEur).toFixed(2).replace(".", ",");
+    if(!confirm("Lire " + nb + " page(s) de « " + p.nom + " » par l'intelligence artificielle ?\nCoût estimé : " + cout + " €\nModèle : " + est.modele + "\nCompte : " + est.courriel)) return;
+    signaler("Lecture en cours…");
+    const pages = await imagesPdf(await driveTelecharger(p.id), nb);
+    const r = await fetch("/api/analyse", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({action:"qualifier", jeton: etat.drive.token, nom: p.nom, pages})});
+    const j = await r.json();
+    if(!r.ok) throw new Error(j.erreur || "échec de la lecture");
+    p.type = j.type; p.date = isoDepuisFr(j.date); p.dateAssemblee = isoDepuisFr(j.dateAssemblee);
+    if(p.type === "PVAG" && p.dateAssemblee) p.date = p.dateAssemblee;
+    p.citees = (j.assembleesCitees || []).map(isoDepuisFr).filter(Boolean);
+    p.source = "claude (" + j.confiance + ")";
+    await renommerSiBesoin(p);
+    rendre(); enregistrer();
+  }catch(e){ signaler(e.message, true); }
+}
+async function renommerSiBesoin(p){
+  if(p.type === "AQ") return;
+  const nom = nomPiece(p, extension(p.nom));
+  if(nom === p.nom) return;
+  try{ await driveRenommer(p.id, nom); p.nom = nom; }catch(e){ signaler("Renommage impossible : " + e.message, true); }
+}
+
+/* ---------- date de vente depuis le dossier client ---------- */
+async function chercherVente(){
+  if(!exigerDrive() || !etat.dossier) return;
+  try{
+    signaler("Recherche d'un avant-contrat dans le dossier client…");
+    const fichiers = (await driveEnfants(etat.dossier.id, "mimeType = 'application/pdf'"))
+      .filter(f => /promesse|compromis|avant.?contrat|\bpsv\b|\bpuv\b/i.test(sansAccent(f.name)));
+    for(const f of fichiers){
+      const {texte} = await textePdf(await driveTelecharger(f.id), 25);
+      const t = sansAccent(texte).toLowerCase();
+      const re = /(realisation|reiteration|signature de l.acte authentique)[^.]{0,160}?(au plus tard le|le|avant le)\s+/g;
+      let m;
+      while((m = re.exec(t))){
+        const d = datesDans(texte.slice(m.index + m[0].length, m.index + m[0].length + 30));
+        if(d.length && d[0].i < 3){
+          etat.vente.date = isoDepuisDate(d[0].d); etat.vente.origine = "dossier client : " + f.name;
+          rendre(); enregistrer(); signaler("Date trouvée dans " + f.name + " — à vérifier.");
+          return;
+        }
+      }
+    }
+    signaler("Aucune date de réitération trouvée dans le dossier client : saisissez-la.", true);
+  }catch(e){ signaler(e.message, true); }
+}
+
+/* ---------- contrôles ---------- */
+function controles(){
+  const a = [];
+  const pieces = etat.pieces;
+  if(!pieces.some(p => p.type === "RCP")) a.push({c:"jaune", t:"Aucun règlement de copropriété ni état descriptif de division déposé."});
+  const aq = pieces.filter(p => p.type === "AQ").length;
+  if(aq) a.push({c:"jaune", t: aq + " pièce" + (aq > 1 ? "s" : "") + " à qualifier."});
+  const ag = pieces.filter(p => p.type === "PVAG" && p.dateAssemblee);
+  if(pieces.some(p => p.type === "PVAG" && !p.dateAssemblee)) a.push({c:"jaune", t:"Un procès-verbal au moins n'a pas de date d'assemblée : à saisir."});
+  if(!pieces.some(p => p.type === "PVAG")) a.push({c:"jaune", t:"Aucun procès-verbal d'assemblée générale déposé."});
+  if(ag.length){
+    // Au moins une assemblée par an, à compter de la plus ancienne déposée.
+    const annees = new Set(ag.map(p => +p.dateAssemblee.slice(0, 4)));
+    const debut = Math.min(...annees), maintenant = new Date(), an = maintenant.getFullYear();
+    for(let y = debut; y < an; y++) if(!annees.has(y)) a.push({c:"jaune", t:"Aucun procès-verbal d'assemblée pour l'année " + y + "."});
+    if(!annees.has(an) && maintenant.getMonth() >= 6) a.push({c:"jaune", t:"Aucune assemblée " + an + " déposée à ce jour : à vérifier auprès du syndic."});
+    // Assemblées citées par un procès-verbal et absentes du dépôt.
+    const tenues = new Set(ag.map(p => p.dateAssemblee));
+    const deja = new Set();
+    ag.forEach(p => (p.citees || []).forEach(c => {
+      if(!tenues.has(c) && !deja.has(c)){ deja.add(c); a.push({c:"jaune", t:"L'assemblée du " + frDepuisISO(c) + " est citée par le procès-verbal du " + frDepuisISO(p.dateAssemblee) + " mais n'est pas déposée."}); }
+    }));
+  }
+  if(!etat.lots.length) a.push({c:"jaune", t:"Aucun lot saisi."});
+  if(!etat.vente.date) a.push({c:"jaune", t:"Date de vente non renseignée : la répartition vendeur / acquéreur en dépend."});
+  return a;
+}
+function contestation(p){
+  const auj = aujourdhui();
+  if(p.notification){
+    const fin = ajouterMois(dateDepuisISO(p.notification), MOIS_CONTESTATION);
+    return auj <= fin ? {c:"ouvert", t:"Encore attaquable jusqu'au " + frDepuisISO(isoDepuisDate(fin))} : {c:"definitif", t:"Définitif depuis le " + frDepuisISO(isoDepuisDate(new Date(fin.getTime() + 864e5)))};
+  }
+  // Sans notification connue : la notification ne peut précéder l'assemblée, donc
+  // tant que deux mois ne sont pas écoulés depuis l'assemblée, les résolutions sont attaquables.
+  const minimum = ajouterMois(dateDepuisISO(p.dateAssemblee), MOIS_CONTESTATION);
+  return auj <= minimum ? {c:"ouvert", t:"Encore attaquable (au moins jusqu'au " + frDepuisISO(isoDepuisDate(minimum)) + ")"} : {c:"inconnu", t:"À confirmer : saisir la date de notification"};
+}
+
+
+/* ============================================================
+   LOT 2 — analyse, voyant de vigilance, restitution à l'écran
+   ============================================================ */
+
+// Les vingt zones ciblées du règlement (arrêtées le 25/09/2026).
+// Repérage par ARTICLE en principe (titre de l'article), par EXPRESSION par exception.
+const ZONES = [
+  {id:"z1",  libelle:"Parties communes et parties privatives", titre:/parties? (communes|privatives)/, expr:/parties? (communes|privatives)/},
+  {id:"z2",  libelle:"Répartition des charges et clés de répartition", titre:/repartition des charges|charges communes|cles? de repartition/, expr:/repartition des charges|cles? de repartition/},
+  {id:"z3",  libelle:"Destination de l'immeuble", titre:/destination/, expr:/destination de l.immeuble|immeuble (est )?destine/},
+  {id:"z4",  libelle:"Restrictions d'usage des lots", titre:/usage des (parties privatives|lots|appartements)|occupation/, expr:/exercice d.une profession|habitation bourgeoise|activite commerciale|usage (exclusif )?d.habitation/},
+  {id:"z5",  libelle:"Servitudes et droits de passage internes", titre:/servitude/, expr:/servitude|droit de passage/},
+  {id:"z6",  libelle:"Droits de jouissance exclusive", titre:/jouissance (exclusive|privative)/, expr:/jouissance (exclusive|privative)/},
+  {id:"z7",  libelle:"Cession et clause d'agrément", titre:/mutation|cession|alienation/, expr:/agrement|mutation|alienation/},
+  {id:"z8",  libelle:"Droit de préemption", titre:/preemption|preference/, expr:/preemption|droit de preference/},
+  {id:"z9",  libelle:"Règles de vote et majorités particulières", titre:/assemblee|majorite|vote|voix/, expr:/majorite|nombre de voix/},
+  {id:"z10", libelle:"Travaux sur les parties privatives", titre:/travaux|modification|harmonie/, expr:/(facade|aspect exterieur|harmonie de l.immeuble)/},
+  {id:"z11", libelle:"Syndicat secondaire ou division en bâtiments", titre:/syndicat secondaire|batiments?/, expr:/syndicat secondaire|par batiment/},
+  {id:"z12", libelle:"Union de syndicats ou ASL rattachée", titre:/union|association syndicale/, expr:/union de syndicats|association syndicale|\basl\b/},
+  {id:"z13", libelle:"Charges spéciales (ascenseur, chauffage) et lots exonérés", titre:/ascenseur|chauffage|charges speciales/, expr:/ascenseur|chauffage collectif|charges speciales/},
+  {id:"z14", libelle:"Solidarité et garantie des arriérés de charges", titre:/solidarit|indivisibilit/, expr:/solidarit|arriere/},
+  {id:"z15", libelle:"Assurance et répartition des sinistres", titre:/assurance|sinistre/, expr:/assurance|sinistre/},
+  {id:"z16", libelle:"Modification du règlement", titre:/modification du (present )?reglement|modifications?$/, expr:/modification du (present )?reglement|modifier le (present )?reglement/},
+  {id:"z17", libelle:"Tantièmes généraux et particuliers", titre:/tantiemes|milliemes|quotes?.parts?/, expr:/tantiemes|milliemes/},
+  {id:"z18", libelle:"Stationnements et leur régime", titre:/stationnement|parking|garage/, expr:/stationnement|parking|emplacement de voiture/},
+  {id:"z19", libelle:"Location (meublée, saisonnière)", titre:/location|bail/, expr:/location (meublee|saisonniere)|courte duree|meuble de tourisme/},
+  {id:"z20", libelle:"Dispositions transitoires ou particulières au promoteur", titre:/dispositions (transitoires|particulieres)|reserve/, expr:/(droits? reserves?|reserve).{0,40}(vendeur|constructeur|promoteur|societe venderesse)/}
+];
+const ANS_PREMIER_PLAN = 3;
+const NATURE_FIN = ["AF","EDA","IMP","BUD","FSC"];
+
+function decouperArticles(texte){
+  const t = sansAccent(texte).toLowerCase();
+  const re = /(?:^|\n|\s)article\s+(\d+|premier|1er|[ivxlc]+)\b/g;
+  const pos = []; let m;
+  while((m = re.exec(t))) pos.push({i: m.index, num: m[1]});
+  return pos.map((p, k) => ({num: p.num, debut: p.i, fin: k + 1 < pos.length ? pos[k+1].i : texte.length}));
+}
+function reperer(texte){
+  const t = sansAccent(texte).toLowerCase();
+  const articles = decouperArticles(texte);
+  return ZONES.map(z => {
+    const retenus = articles.filter(a => z.titre.test(t.slice(a.debut, Math.min(a.fin, a.debut + 220)))).slice(0, 3);
+    if(retenus.length) return {id: z.id, mode: "article", extrait: retenus.map(a => texte.slice(a.debut, Math.min(a.fin, a.debut + 3000)).trim()).join("\n[…]\n")};
+    const i = t.search(z.expr);
+    if(i >= 0) return {id: z.id, mode: "expression", extrait: texte.slice(Math.max(0, i - 800), i + 1400).trim()};
+    return {id: z.id, mode: "introuvable", extrait: null};
+  });
+}
+function extraitsLots(texte){
+  const t = sansAccent(texte).toLowerCase();
+  return etat.lots.filter(l => l.numero).map(l => {
+    const re = new RegExp("\\blots?\\s*(?:n\\s*[°o.]*|numero)?\\s*" + l.numero.replace(/[^\w]/g, "") + "\\b", "g");
+    const bouts = []; let m;
+    while((m = re.exec(t)) && bouts.length < 2) bouts.push(texte.slice(Math.max(0, m.index - 150), m.index + 900));
+    return bouts.length ? "LOT " + l.numero + " :\n" + bouts.join("\n[…]\n") : null;
+  }).filter(Boolean);
+}
+
+async function appelAnalyse(corps){
+  const r = await fetch("/api/analyse", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(Object.assign({action:"analyser", jeton: etat.drive.token}, corps))});
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(j.erreur || "échec de l'analyse");
+  return j.resultat;
+}
+const progres = t => { $("progres").textContent = t || ""; };
+
+// Prépare la liste des envois (sans rien envoyer) pour pouvoir chiffrer avant confirmation.
+async function preparerEnvois(tout){
+  const envois = [];
+  const lots = etat.lots.map(l => l.numero).filter(Boolean);
+  const rcp = etat.pieces.filter(p => p.type === "RCP" || p.type === "RCPM").sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  if(rcp.length && (tout || !etat.analyse.reglement)){
+    let texte = "", sansTexte = [];
+    for(const p of rcp){
+      progres("Lecture de " + p.nom + "…");
+      const l = await textePdf(await driveTelecharger(p.id), 400);
+      if(l.texte.replace(/\s/g, "").length < 500) sansTexte.push(p.nom);
+      else texte += "\n\n===== " + (p.type === "RCPM" ? "MODIFICATIF" : "ACTE D'ORIGINE") + " — " + p.nom + " =====\n" + l.texte;
+    }
+    const zones = reperer(texte);
+    const blocs = zones.filter(z => z.extrait).map(z => "### ZONE " + z.id + " — " + ZONES.find(x => x.id === z.id).libelle + " (repérée par " + z.mode + ")\n" + z.extrait);
+    const moitie = Math.ceil(blocs.length / 2);
+    const lotsTxt = extraitsLots(texte);
+    envois.push({nature:"reglement", partie:1, zones, sansTexte, texte: blocs.slice(0, moitie).join("\n\n"), nom:"règlement (zones 1/2)"});
+    envois.push({nature:"reglement", partie:2, zones, sansTexte, texte: blocs.slice(moitie).join("\n\n") + (lotsTxt.length ? "\n\n### EXTRAITS DE L'ÉTAT DESCRIPTIF POUR LES LOTS\n" + lotsTxt.join("\n\n") : ""), nom:"règlement (zones 2/2 et lots)"});
+  }
+  const autres = etat.pieces.filter(p => (p.type === "PVAG" || NATURE_FIN.includes(p.type)) && (tout || !etat.analyse.pieces[p.id]));
+  for(const p of autres){
+    progres("Lecture de " + p.nom + "…");
+    const blob = await driveTelecharger(p.id);
+    const l = await textePdf(blob, 80);
+    const nature = p.type === "PVAG" ? "pv" : "financier";
+    if(l.texte.replace(/\s/g, "").length >= 200) envois.push({nature, piece: p, texte: l.texte, nom: p.nom});
+    else envois.push({nature, piece: p, blob, images: Math.min(6, l.pages || 6), nom: p.nom});
+  }
+  progres("");
+  return {envois, lots};
+}
+async function lancerAnalyse(tout){
+  if(!exigerDrive() || !etat.dossier) return;
+  try{
+    const est = await (await fetch("/api/analyse", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({action:"estimer", jeton: etat.drive.token})})).json();
+    if(!est.configure || !est.autorise){ signaler("Analyse indisponible : " + (est.motif || "configuration incomplète"), true); return; }
+    const {envois, lots} = await preparerEnvois(tout);
+    if(!envois.length){ signaler("Rien de nouveau à analyser."); return; }
+    let jetons = 0, images = 0;
+    envois.forEach(e => { if(e.texte) jetons += e.texte.length / 3.5; else images += e.images; });
+    const euros = (jetons * est.coutEntreeMJ + envois.length * 3000 * est.coutSortieMJ) / 1e6 + images * est.coutPageEur;
+    if(!confirm(envois.length + " envoi(s) à l'analyse : " + envois.map(e => e.nom).join(", ") + "\n\nCoût estimé : " + euros.toFixed(2).replace(".", ",") + " €\nModèle : " + est.modele + "\nCompte : " + est.courriel)) return;
+    let fait = 0, reglement = {zones:{}, lots:[], organisations:null, modes:{}, sansTexte:[]};
+    for(const e of envois){
+      progres("Analyse " + (++fait) + "/" + envois.length + " : " + e.nom);
+      try{
+        const corps = {nature: e.nature, contexte: {nom: e.nom, lots}};
+        if(e.texte) corps.texte = e.texte; else corps.pages = await imagesPdf(e.blob, e.images);
+        const r = await appelAnalyse(corps);
+        if(e.nature === "reglement"){
+          e.zones.forEach(z => reglement.modes[z.id] = z.mode);
+          reglement.sansTexte = e.sansTexte;
+          (r.zones || []).forEach(z => { if(z && z.id) reglement.zones[z.id] = z; });
+          if(Array.isArray(r.lots) && r.lots.length) reglement.lots = r.lots;
+          if(r.organisations) reglement.organisations = r.organisations;
+          if(e.partie === 2){ etat.analyse.reglement = Object.assign({maj: new Date().toISOString()}, reglement); }
+        }else{
+          etat.analyse.pieces[e.piece.id] = Object.assign({nature: e.nature, type: e.piece.type, maj: new Date().toISOString()}, r);
+          if(e.nature === "pv" && r.dateAssemblee && !e.piece.dateAssemblee){ e.piece.dateAssemblee = isoDepuisFr(r.dateAssemblee); e.piece.date = e.piece.dateAssemblee; }
+        }
+        enregistrer(); rendre();
+      }catch(err){ signaler(e.nom + " : " + err.message, true); }
+    }
+    progres("Analyse terminée.");
+  }catch(e){ progres(""); signaler(e.message, true); }
+}
+
+/* ---------- agrégation ---------- */
+const nombre = v => (v == null || v === "" || isNaN(Number(v))) ? null : Number(v);
+const euro = v => v == null ? "—" : Number(v).toLocaleString("fr-FR", {style:"currency", currency:"EUR"});
+function datePiece(id){ const p = etat.pieces.find(x => x.id === id); return p ? (p.dateAssemblee || p.date || "") : ""; }
+function synthese(){
+  const res = Object.entries(etat.analyse.pieces).map(([id, r]) => Object.assign({id, dateTri: datePiece(id)}, r)).sort((a, b) => b.dateTri.localeCompare(a.dateTri));
+  const pv = res.filter(r => r.nature === "pv"), fin = res.filter(r => r.nature === "financier");
+  const premier = (liste, f) => { for(const r of liste){ const v = f(r); if(v != null && v !== "") return v; } return null; };
+  const limite = new Date(); limite.setFullYear(limite.getFullYear() - ANS_PREMIER_PLAN); const limiteISO = isoDepuisDate(limite);
+  const budget = premier(fin, r => r.budgetAnnuel && nombre(r.budgetAnnuel.montant)) ?? premier(pv, r => r.budget && nombre(r.budget.montant));
+  const impayes = premier(fin, r => r.impayesCoproprietaires && nombre(r.impayesCoproprietaires.montant)) ?? premier(pv, r => r.impayes && nombre(r.impayes.montant));
+  const dette = {
+    emprunt: premier(fin, r => r.detteSyndicat && nombre(r.detteSyndicat.empruntCollectif)) ?? premier(pv, r => r.empruntCollectif && nombre(r.empruntCollectif.montant)),
+    decouvert: premier(fin, r => r.detteSyndicat && nombre(r.detteSyndicat.decouvert)),
+    fournisseurs: premier(fin, r => r.detteSyndicat && nombre(r.detteSyndicat.fournisseursEchus))
+  };
+  // Procédures : la mention la plus récente de chaque objet fait foi.
+  const vues = new Map();
+  [...fin, ...pv].sort((a, b) => b.dateTri.localeCompare(a.dateTri)).forEach(r => (r.procedures || []).forEach(p => {
+    const cle = sansAccent(p.objet || "").toLowerCase().slice(0, 50);
+    if(cle && !vues.has(cle)) vues.set(cle, Object.assign({source: r.dateTri}, p));
+  }));
+  const procedures = [...vues.values()].filter(p => p.etat !== "terminée");
+  // Travaux votés et appels, avec leur date d'exigibilité.
+  const travaux = [], appels = [];
+  pv.forEach(r => (r.resolutions || []).forEach(x => {
+    if(x.decision === "adoptée" && x.travaux){
+      travaux.push({ag: r.dateTri, resolution: x.numero, objet: x.travaux.objet || x.objet, montant: nombre(x.travaux.montant), financement: x.travaux.financement, lots: x.lots || [], echeances: (x.travaux.echeances || []).map(e => ({date: isoDepuisFr(e.date), montant: nombre(e.montant), pourcentage: e.pourcentage}))});
+    }
+  }));
+  fin.forEach(r => (r.appels || []).forEach(a => appels.push({lot: a.lot, objet: a.objet, montant: nombre(a.montant), exigibilite: isoDepuisFr(a.exigibilite), travaux: a.travaux, piece: r.id})));
+  const syndic = premier(fin.concat(pv).sort((a, b) => b.dateTri.localeCompare(a.dateTri)), r => r.syndic);
+  const ag = pv.filter(r => r.dateTri).map(r => r.dateTri);
+  return {pv, fin, budget, impayes, dette, procedures, travaux, appels, syndic, derniereAG: ag.length ? ag[0] : null, limiteISO};
+}
+
+/* ---------- voyant de vigilance ---------- */
+// Trois niveaux par critère (vert, orange, rouge) ; « non évalué » faute de donnée.
+// Voyant général : deux critères au rouge → rouge ; un seul → orange ; un orange → orange ; sinon vert.
+function voyant(S, alertesJaunes){
+  const seuil = Number(etat.analyse.seuilImpayes) || 15;
+  const auj = isoDepuisDate(aujourdhui());
+  const c = [];
+  // 1. impayés des copropriétaires rapportés au budget annuel
+  if(S.impayes != null && S.budget){
+    const ratio = S.impayes / S.budget * 100;
+    c.push({nom:"Impayés", niveau: ratio >= seuil ? "rouge" : ratio >= seuil / 2 ? "orange" : "vert", detail: ratio.toFixed(1).replace(".", ",") + " % du budget"});
+  }else c.push({nom:"Impayés", niveau:null, detail:"budget ou impayés inconnus"});
+  // 2. procédures en cours
+  if(S.pv.length || S.fin.length){
+    const enCours = S.procedures.filter(p => p.etat === "en cours").length, envisagees = S.procedures.filter(p => p.etat === "envisagée").length;
+    c.push({nom:"Procédures", niveau: enCours ? "rouge" : envisagees ? "orange" : "vert", detail: enCours ? enCours + " en cours" : envisagees ? envisagees + " envisagée(s)" : "aucune"});
+  }else c.push({nom:"Procédures", niveau:null, detail:"aucune pièce analysée"});
+  // 3. travaux votés non financés
+  if(S.pv.length){
+    const nonFinances = S.travaux.filter(t => (t.financement === "non précisé" || !t.financement) && !t.echeances.length);
+    const aVenir = S.travaux.filter(t => t.echeances.some(e => e.date && e.date > auj));
+    c.push({nom:"Travaux votés", niveau: nonFinances.length ? "rouge" : aVenir.length ? "orange" : "vert", detail: nonFinances.length ? nonFinances.length + " sans financement" : aVenir.length ? aVenir.length + " avec appels à venir" : "rien en attente"});
+  }else c.push({nom:"Travaux votés", niveau:null, detail:"aucun procès-verbal analysé"});
+  // 4. documentation
+  const zonesIntrouvables = etat.analyse.reglement ? Object.values(etat.analyse.reglement.modes || {}).filter(m => m === "introuvable").length : 0;
+  const sansRcp = !etat.pieces.some(p => p.type === "RCP");
+  c.push({nom:"Documentation", niveau: sansRcp ? "rouge" : (alertesJaunes || zonesIntrouvables) ? "orange" : "vert", detail: sansRcp ? "règlement non déposé" : (alertesJaunes + zonesIntrouvables) ? (alertesJaunes + zonesIntrouvables) + " lacune(s)" : "complète"});
+  // 5. endettement propre du syndicat
+  const d = S.dette;
+  if(d.emprunt != null || d.decouvert != null || d.fournisseurs != null){
+    const rouge = (d.decouvert || 0) > 0 || (S.budget && (d.fournisseurs || 0) / S.budget * 100 >= seuil);
+    c.push({nom:"Endettement du syndicat", niveau: rouge ? "rouge" : (d.emprunt || 0) > 0 ? "orange" : "vert", detail: [d.emprunt ? "emprunt " + euro(d.emprunt) : null, d.decouvert ? "découvert " + euro(d.decouvert) : null, d.fournisseurs ? "fournisseurs échus " + euro(d.fournisseurs) : null].filter(Boolean).join(", ") || "aucune dette"});
+  }else c.push({nom:"Endettement du syndicat", niveau:null, detail:"aucune donnée financière"});
+  const rouges = c.filter(x => x.niveau === "rouge").length, oranges = c.filter(x => x.niveau === "orange").length, evalues = c.filter(x => x.niveau).length;
+  const general = !evalues ? null : rouges >= 2 ? "rouge" : rouges === 1 ? "orange" : oranges ? "orange" : "vert";
+  return {general, criteres: c};
+}
+const LIB_NIVEAU = {vert:"saine", orange:"sous vigilance", rouge:"en difficulté"};
+
+/* ---------- restitution à l'écran ---------- */
+function repartition(date){ if(!etat.vente.date || !date) return "à déterminer"; return date <= etat.vente.date ? "vendeur" : "acquéreur"; }
+function rendreAnalyse(){
+  const al = controles().length;
+  const S = synthese(), V = voyant(S, al);
+  // voyant
+  $("voyants").innerHTML = '<div class="voyant general"><span class="pastille ' + (V.general || "") + '"></span><div>Copropriété ' + esc(V.general ? LIB_NIVEAU[V.general] : "non évaluée") + "</div></div>"
+    + V.criteres.map(x => '<div class="voyant"><span class="pastille ' + (x.niveau || "") + '"></span><div>' + esc(x.nom) + "<small>" + esc(x.niveau ? x.detail : "non évalué : " + x.detail) + "</small></div></div>").join("");
+  $("voyant-regle").textContent = "Deux critères au rouge : voyant général rouge. Un seul critère au rouge, ou un critère à l'orange : orange. Seuil d'impayés : " + (etat.analyse.seuilImpayes || 15) + " % du budget annuel (orange dès la moitié).";
+  $("seuil-impayes").value = etat.analyse.seuilImpayes || 15;
+
+  $("restitution").innerHTML = blocsEcran(construire("interne"));
+}
+function premier2(liste, f){ for(const r of liste){ const v = f(r); if(v) return v; } return null; }
+
+$("btn-analyser").addEventListener("click", () => lancerAnalyse(false));
+$("btn-tout-analyser").addEventListener("click", () => { if(confirm("Relancer l'analyse de toutes les pièces ?")) lancerAnalyse(true); });
+$("seuil-impayes").addEventListener("change", e => { const v = Number(String(e.target.value).replace(",", ".")); if(v > 0){ etat.analyse.seuilImpayes = v; enregistrer(); } rendre(); });
+
+
+/* ============================================================
+   LOT 3 (première partie) — un seul contenu, trois rendus :
+   écran, Word (docx 8.5, comme PLUME et FUSION), PDF (impression).
+   Deux versions : INTERNE (lacunes et alertes en couleur) et CLIENT
+   (alertes neutres, « points appelant votre attention », pièces non
+   communiquées). Le voyant de vigilance reste à l'écran, jamais au document.
+   ============================================================ */
+const PIECES_ATTENDUES = [
+  ["RCP","le règlement de copropriété et l'état descriptif de division, avec leurs modificatifs"],
+  ["PVAG","les procès-verbaux des trois dernières assemblées générales"],
+  ["AF","les derniers appels de fonds"],
+  ["EDA","le pré-état daté"],
+  ["FSC","la fiche synthétique de la copropriété"],
+  ["CE","le carnet d'entretien de l'immeuble"],
+  ["DTG","le diagnostic technique global, s'il existe"],
+  ["DPC","les diagnostics des parties communes (amiante, plomb)"],
+  ["BUD","le dernier budget prévisionnel et les derniers comptes approuvés"],
+  ["EHF","l'état hypothécaire"]
+];
+function piecesManquantes(){
+  const m = PIECES_ATTENDUES.filter(([k]) => !etat.pieces.some(p => p.type === k)).map(([, l]) => l);
+  const ag = etat.pieces.filter(p => p.type === "PVAG" && p.dateAssemblee);
+  if(ag.length){
+    const annees = new Set(ag.map(p => +p.dateAssemblee.slice(0, 4))), an = new Date().getFullYear();
+    for(let y = Math.min(...annees); y < an; y++) if(!annees.has(y)) m.push("le procès-verbal de l'assemblée générale tenue en " + y);
+    const tenues = new Set(ag.map(p => p.dateAssemblee)), vues = new Set();
+    ag.forEach(p => (p.citees || []).forEach(c => { if(!tenues.has(c) && !vues.has(c)){ vues.add(c); m.push("le procès-verbal de l'assemblée générale du " + frDepuisISO(c)); } }));
+  }
+  return m;
+}
+function montantAcquereur(S, numero){
+  return S.appels.filter(a => String(a.lot || "") === String(numero) && repartition(a.exigibilite) === "acquéreur").reduce((t, a) => t + (a.montant || 0), 0);
+}
+function construire(version){
+  const interne = version === "interne";
+  const B = [], add = (s, t, x) => B.push(Object.assign({s, t}, x || {}));
+  const S = synthese(), R = etat.analyse.reglement, attention = [];
+  add("titre", "Analyse de la copropriété" + (etat.dossier ? " — " + etat.dossier.nom : ""));
+  add("note", interne
+    ? "Version interne, produite le " + frDepuisISO(isoDepuisDate(new Date())) + ". Les mentions colorées sont des indications de travail."
+    : "Document établi le " + frDepuisISO(isoDepuisDate(new Date())) + " sur la base des seules pièces communiquées à l'office.");
+  if(etat.vente.date) add("p", "Date de vente retenue : " + frDepuisISO(etat.vente.date) + (etat.vente.promesse ? " ; promesse du " + frDepuisISO(etat.vente.promesse) : "") + ".");
+
+  // vue d'ensemble comparative, seulement s'il y a plusieurs lots
+  if(etat.lots.length > 1){
+    add("partie", "Vue d'ensemble des lots");
+    add("tableau", null, {entete: ["Lot", "Désignation", "Tantièmes", "Charges annuelles", "Appels à la charge de l'acquéreur"], lignes: etat.lots.map(l => {
+      const f = R && (R.lots || []).find(x => String(x.numero) === String(l.numero)) || {};
+      const q = premier2(S.fin, r => (r.quotePartLot || []).find(x => String(x.lot) === String(l.numero)));
+      return [l.numero || "—", l.designation || "—", f.tantiemes || "—", q ? euro(q.chargesAnnuelles) : "—", euro(montantAcquereur(S, l.numero))];
+    })});
+  }
+
+  add("partie", "Première partie — la copropriété");
+  add("p", "Syndic : " + (S.syndic || "non identifié dans les pièces communiquées") + ".");
+  add("p", "Dernière assemblée générale : " + (S.derniereAG ? frDepuisISO(S.derniereAG) : "non identifiée") + ".");
+  add("p", "Budget annuel : " + euro(S.budget) + " ; impayés de l'ensemble des copropriétaires : " + euro(S.impayes) + ".");
+  add("sous", "Procédures en cours");
+  add("p", S.procedures.length ? S.procedures.map(p => p.objet + " (" + p.etat + ")").join(" ; ") + "." : "Aucune procédure en cours n'est relevée dans les pièces communiquées.");
+  S.procedures.forEach(p => attention.push({c: p.etat === "en cours" ? "rouge" : "orange", t: "Procédure " + p.etat + " : " + p.objet + "."}));
+  if(R && R.organisations && (R.organisations.syndicatSecondaire || R.organisations.unionOuAsl)){
+    add("sous", "Organisation");
+    if(R.organisations.syndicatSecondaire) add("p", "L'immeuble comporte un ou plusieurs syndicats secondaires.");
+    if(R.organisations.unionOuAsl) add("p", R.organisations.unionOuAsl);
+  }
+  add("sous", "Règlement de copropriété");
+  if(!R) add("p", "Règlement non encore analysé.");
+  else{
+    if(interne && R.sansTexte && R.sansTexte.length) add("alerte", "Sans couche de texte, non lu : " + R.sansTexte.join(", ") + ".", {c:"orange"});
+    ZONES.forEach(z => {
+      const r = R.zones[z.id], mode = (R.modes || {})[z.id];
+      if(mode === "introuvable"){ if(interne) add("alerte", "Lacune : zone « " + z.libelle + " » repérée ni par article ni par expression.", {c:"jaune"}); return; }
+      if(!r || !r.synthese) return;
+      add("zone", r.synthese, {titre: z.libelle, ref: (r.references || "") + (interne && mode === "expression" ? " (repérée par expression)" : ""), c: r.vigilance !== "aucune" ? r.vigilance : null});
+      if(r.vigilance && r.vigilance !== "aucune") attention.push({c: r.vigilance === "alerte" ? "rouge" : "orange", t: z.libelle + " : " + (r.motif || r.synthese)});
+    });
+  }
+  // assemblées
+  const blocAG = r => {
+    const lignes = (r.resolutions || []).filter(x => x.travaux || (x.lots && x.lots.length) || x.decision === "rejetée")
+      .map(x => "Résolution " + x.numero + " : " + x.objet + " — " + x.decision + (x.travaux && x.travaux.montant ? ", " + euro(x.travaux.montant) : "") + ".");
+    add("p", "Assemblée du " + frDepuisISO(r.dateTri) + (r.nature ? " (" + r.nature + ")" : "") + ". " + (lignes.join(" ") || "Aucune résolution de travaux ni décision propre à un lot."), {gras: true});
+    (r.pointsAttention || []).forEach(t => attention.push({c:"orange", t: "Assemblée du " + frDepuisISO(r.dateTri) + " : " + t}));
+  };
+  const recents = S.pv.filter(r => r.dateTri >= S.limiteISO), anciens = S.pv.filter(r => r.dateTri < S.limiteISO);
+  add("sous", "Assemblées générales des trois dernières années");
+  if(recents.length) recents.forEach(blocAG); else add("p", "Aucun procès-verbal des trois dernières années n'a été communiqué.");
+  if(anciens.length){ add("sous", "Historique des assemblées (au-delà de trois ans)"); anciens.forEach(blocAG); }
+  const agDeposees = etat.pieces.filter(p => p.type === "PVAG" && p.dateAssemblee).sort((a, b) => b.dateAssemblee.localeCompare(a.dateAssemblee));
+  if(agDeposees.length) add("tableau", null, {entete: ["Assemblée du", "Délai de contestation"], lignes: agDeposees.map(p => [frDepuisISO(p.dateAssemblee), contestation(p).t])});
+  if(S.travaux.length){
+    add("sous", "Travaux votés");
+    add("tableau", null, {entete: ["Assemblée", "Objet", "Montant", "Échéances", "À la charge de"], lignes: S.travaux.map(t => [
+      frDepuisISO(t.ag), t.objet || "—", euro(t.montant),
+      t.echeances.length ? t.echeances.map(e => frDepuisISO(e.date) + (e.montant ? " : " + euro(e.montant) : e.pourcentage ? " : " + e.pourcentage + " %" : "")).join(" ; ") : "financement non précisé",
+      t.echeances.length ? [...new Set(t.echeances.map(e => repartition(e.date)))].join(" / ") : "à déterminer"])});
+    S.travaux.filter(t => !t.echeances.length && (!t.financement || t.financement === "non précisé")).forEach(t => attention.push({c:"rouge", t: "Travaux votés sans financement précisé : " + t.objet + " (assemblée du " + frDepuisISO(t.ag) + ")."}));
+  }
+
+  // seconde partie
+  add("partie", "Seconde partie — " + (etat.lots.length > 1 ? "les lots" : "le lot"));
+  if(!etat.lots.length) add("p", "Aucun lot n'a été désigné.");
+  etat.lots.forEach(l => {
+    const f = R && (R.lots || []).find(x => String(x.numero) === String(l.numero)) || {};
+    const appelsLot = S.appels.filter(a => String(a.lot || "") === String(l.numero));
+    const autorisations = [];
+    S.pv.forEach(r => (r.autorisationsLots || []).filter(a => String(a.lot) === String(l.numero)).forEach(a => autorisations.push(frDepuisISO(r.dateTri) + " : " + a.objet)));
+    const q = premier2(S.fin, r => (r.quotePartLot || []).find(x => String(x.lot) === String(l.numero)));
+    const imp = premier2(S.fin, r => (r.impayesLot || []).find(x => String(x.lot) === String(l.numero)));
+    add("sous", "Lot " + (l.numero || "sans numéro") + (l.designation ? " — " + l.designation : ""));
+    add("tableau", null, {deuxColonnes: true, entete: ["", ""], lignes: [
+      ["Consistance", f.consistance || "non relevée"], ["Annexes", f.annexes || "aucune relevée"],
+      ["Tantièmes", [f.tantiemes, f.tantiemesParticuliers].filter(Boolean).join(" ; ") || "non relevés"],
+      ["Charges annuelles", q ? euro(q.chargesAnnuelles) : "non relevées"], ["Impayés du lot", imp ? euro(imp.montant) : "aucun relevé"],
+      ["Travaux autorisés sur le lot", autorisations.join(" ; ") || "aucun relevé"]]});
+    if(imp && imp.montant > 0) attention.push({c:"rouge", t: "Impayés de charges sur le lot " + l.numero + " : " + euro(imp.montant) + "."});
+    if(appelsLot.length) add("tableau", null, {entete: ["Appel", "Montant", "Exigible le", "À la charge de"], lignes: appelsLot.map(a => [a.objet || "—", euro(a.montant), frDepuisISO(a.exigibilite), repartition(a.exigibilite)])});
+  });
+
+  // points d'attention et pièces non communiquées
+  const manquantes = piecesManquantes();
+  if(interne){
+    add("partie", "Alertes");
+    const jaunes = controles();
+    if(!attention.length && !jaunes.length) add("p", "Aucune alerte.");
+    attention.forEach(a => add("alerte", a.t, {c: a.c}));
+    jaunes.forEach(a => add("alerte", a.t, {c:"jaune"}));
+    add("partie", "Pièces manquantes");
+    if(manquantes.length) manquantes.forEach(m => add("alerte", m.charAt(0).toUpperCase() + m.slice(1) + ".", {c:"jaune"}));
+    else add("p", "Toutes les pièces attendues sont au dossier.");
+  }else{
+    add("partie", "Points appelant votre attention");
+    if(attention.length) attention.forEach(a => add("puce", a.t)); else add("p", "Les pièces communiquées ne font apparaître aucun point particulier.");
+    if(manquantes.length){ add("partie", "Pièces non communiquées"); add("p", "L'analyse ci-dessus ne tient pas compte des pièces suivantes, qui n'ont pas été communiquées :"); manquantes.forEach(m => add("puce", m.charAt(0).toUpperCase() + m.slice(1) + ".")); }
+  }
+  return B;
+}
+
+const TEINTES = {jaune:"#FFE764", orange:"#FF982D", rouge:"#A01040"};
+function blocsEcran(B){
+  let h = "", liste = false;
+  const fermer = () => { if(liste){ h += "</ul>"; liste = false; } };
+  B.forEach(b => {
+    if(b.s !== "puce") fermer();
+    if(b.s === "titre" || b.s === "note") return;
+    if(b.s === "partie") h += "<h3>" + esc(b.t) + "</h3>";
+    else if(b.s === "sous") h += "<h4>" + esc(b.t) + "</h4>";
+    else if(b.s === "p") h += "<p>" + (b.gras ? "<b>" + esc(b.t) + "</b>" : esc(b.t)) + "</p>";
+    else if(b.s === "zone") h += '<div class="zone ' + (b.c || "") + '"><b>' + esc(b.titre) + '</b> <span class="ref">' + esc(b.ref) + "</span><p>" + esc(b.t) + "</p></div>";
+    else if(b.s === "alerte") h += '<div class="alerte ' + (b.c === "jaune" ? "" : b.c) + '">' + esc(b.t) + "</div>";
+    else if(b.s === "puce"){ if(!liste){ h += "<ul>"; liste = true; } h += "<li>" + esc(b.t) + "</li>"; }
+    else if(b.s === "tableau") h += '<div class="tableau"><table>' + (b.deuxColonnes ? "" : "<thead><tr>" + b.entete.map(e => "<th>" + esc(e) + "</th>").join("") + "</tr></thead>") + "<tbody>" + b.lignes.map(l => "<tr>" + l.map((c, i) => "<td" + (b.deuxColonnes && !i ? ' style="color:var(--gris);width:220px"' : "") + ">" + esc(c) + "</td>").join("") + "</tr>").join("") + "</tbody></table></div>";
+  });
+  fermer();
+  return h;
+}
+function blocsImpression(B, interne){
+  const css = "body{font-family:Georgia,'Times New Roman',serif;font-size:11.5pt;line-height:1.5;color:#111;margin:22mm 18mm}h1{font-size:18pt;margin:0 0 4mm;color:#0F2238}h2{font-size:14pt;margin:9mm 0 3mm;color:#0F2238;border-bottom:1px solid #33838B;padding-bottom:1mm}h3{font-size:12pt;margin:6mm 0 2mm;color:#33838B}p{margin:0 0 2.6mm;text-align:justify}.note{color:#666;font-style:italic}.zone{margin:0 0 3mm}.zone .ref{color:#666;font-size:10pt}table{border-collapse:collapse;margin:2mm 0 4mm;font-size:10.5pt;width:100%}td,th{border:1px solid #bbb;padding:3px 7px;text-align:left;vertical-align:top}th{background:#EEF1F4}.alerte{padding:3px 8px;margin:0 0 1.5mm;font-family:'Segoe UI',system-ui,sans-serif;font-size:10pt;border-left:5px solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pied{color:#666;font-size:9.5pt;margin-top:10mm}";
+  let h = "<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>" + esc(B[0].t) + "</title><style>" + css + "</style></head><body>", liste = false;
+  const fermer = () => { if(liste){ h += "</ul>"; liste = false; } };
+  B.forEach(b => {
+    if(b.s !== "puce") fermer();
+    if(b.s === "titre") h += "<h1>" + esc(b.t) + "</h1>";
+    else if(b.s === "note") h += "<p class='note'>" + esc(b.t) + "</p>";
+    else if(b.s === "partie") h += "<h2>" + esc(b.t) + "</h2>";
+    else if(b.s === "sous") h += "<h3>" + esc(b.t) + "</h3>";
+    else if(b.s === "p") h += "<p>" + (b.gras ? "<b>" + esc(b.t) + "</b>" : esc(b.t)) + "</p>";
+    else if(b.s === "zone") h += "<div class='zone'><b>" + esc(b.titre) + "</b> <span class='ref'>" + esc(b.ref) + "</span><p>" + esc(b.t) + "</p></div>";
+    else if(b.s === "alerte") h += "<p class='alerte' style='border-color:" + TEINTES[b.c || "jaune"] + ";background:" + TEINTES[b.c || "jaune"] + "22'>" + esc(b.t) + "</p>";
+    else if(b.s === "puce"){ if(!liste){ h += "<ul>"; liste = true; } h += "<li>" + esc(b.t) + "</li>"; }
+    else if(b.s === "tableau") h += "<table>" + (b.deuxColonnes ? "" : "<thead><tr>" + b.entete.map(e => "<th>" + esc(e) + "</th>").join("") + "</tr></thead>") + "<tbody>" + b.lignes.map(l => "<tr>" + l.map(c => "<td>" + esc(c) + "</td>").join("") + "</tr>").join("") + "</tbody></table>";
+  });
+  fermer();
+  return h + "<p class='pied'>FIDAL Notaires — COPRO</p></body></html>";
+}
+let docxPromesse = null;
+function chargerDocx(){
+  if(window.docx) return Promise.resolve(window.docx);
+  if(!docxPromesse) docxPromesse = new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"; sc.onload = () => ok(window.docx); sc.onerror = () => ko(new Error("bibliothèque Word indisponible")); document.head.appendChild(sc); });
+  return docxPromesse;
+}
+async function blocsWord(B){
+  const D = await chargerDocx();
+  const run = (t, o) => new D.TextRun(Object.assign({text: t, font: "Georgia", size: 23}, o || {}));
+  const bord = {style: D.BorderStyle.SINGLE, size: 4, color: "BBBBBB"};
+  const cellule = (t, entete) => new D.TableCell({borders: {top: bord, bottom: bord, left: bord, right: bord}, shading: entete ? {fill: "EEF1F4"} : undefined,
+    children: [new D.Paragraph({children: [run(String(t), {size: 20, bold: !!entete})]})]});
+  const enfants = [];
+  B.forEach(b => {
+    if(b.s === "titre") enfants.push(new D.Paragraph({children: [run(b.t, {bold: true, size: 34, color: "0F2238"})], spacing: {after: 120}}));
+    else if(b.s === "note") enfants.push(new D.Paragraph({children: [run(b.t, {italics: true, color: "666666", size: 20})], spacing: {after: 200}}));
+    else if(b.s === "partie") enfants.push(new D.Paragraph({children: [run(b.t, {bold: true, size: 28, color: "0F2238"})], spacing: {before: 320, after: 120}}));
+    else if(b.s === "sous") enfants.push(new D.Paragraph({children: [run(b.t, {bold: true, size: 24, color: "33838B"})], spacing: {before: 200, after: 80}}));
+    else if(b.s === "p") enfants.push(new D.Paragraph({alignment: D.AlignmentType.JUSTIFIED, children: [run(b.t, {bold: !!b.gras})], spacing: {after: 100}}));
+    else if(b.s === "zone") enfants.push(new D.Paragraph({children: [run(b.titre, {bold: true}), run(b.ref ? "  " + b.ref : "", {size: 19, color: "666666"})], spacing: {before: 80}}), new D.Paragraph({alignment: D.AlignmentType.JUSTIFIED, children: [run(b.t)], spacing: {after: 100}}));
+    else if(b.s === "alerte") enfants.push(new D.Paragraph({children: [run(b.t, {font: "Segoe UI", size: 20})], shading: {fill: TEINTES[b.c || "jaune"].replace("#", "") + (b.c === "rouge" ? "" : ""), type: D.ShadingType.CLEAR, color: "auto"},
+      border: {left: {style: D.BorderStyle.SINGLE, size: 24, color: TEINTES[b.c || "jaune"].replace("#", ""), space: 4}}, spacing: {after: 60}}));
+    else if(b.s === "puce") enfants.push(new D.Paragraph({bullet: {level: 0}, children: [run(b.t)], spacing: {after: 60}}));
+    else if(b.s === "tableau") enfants.push(new D.Table({width: {size: 100, type: D.WidthType.PERCENTAGE},
+      rows: (b.deuxColonnes ? [] : [new D.TableRow({tableHeader: true, children: b.entete.map(e => cellule(e, true))})]).concat(b.lignes.map(l => new D.TableRow({children: l.map(c => cellule(c))})))}),
+      new D.Paragraph({children: [], spacing: {after: 100}}));
+  });
+  const doc = new D.Document({creator: "COPRO — FIDAL Notaires", title: B[0].t, sections: [{properties: {page: {margin: {top: 1134, bottom: 1134, left: 1134, right: 1134}}}, children: enfants}]});
+  return D.Packer.toBlob(doc);
+}
+function nomSortie(version, ext){
+  const base = (etat.dossier ? sansAccent(etat.dossier.nom).replace(/[^\w]+/g, "_").replace(/^_|_$/g, "") : "dossier");
+  return "COPRO_" + base + "_" + version + "_" + isoDepuisDate(new Date()).replace(/-/g, "") + "." + ext;
+}
+async function produire(sortie){
+  const [format, version] = sortie.split("-");
+  const B = construire(version);
+  try{
+    if(format === "word"){
+      const blob = await blocsWord(B);
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nomSortie(version, "docx"); a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      if(driveConnecte() && etat.dossier){ try{ await driveEnvoyer(blob, nomSortie(version, "docx"), etat.dossier.coproId); signaler("Word déposé aussi dans le sous-dossier Copropriété."); }catch(e){} }
+    }else{
+      const w = window.open("", "_blank");
+      if(!w){ signaler("Fenêtre bloquée : autorisez les fenêtres surgissantes pour produire le PDF.", true); return; }
+      w.document.write(blocsImpression(B, version === "interne")); w.document.close();
+      setTimeout(() => w.print(), 400);
+    }
+  }catch(e){ signaler(e.message, true); }
+}
+
+/* ---------- demande de pièces ---------- */
+function texteDemande(){
+  const manquantes = piecesManquantes(), R = etat.analyse.reglement;
+  const asl = R && R.organisations && R.organisations.unionOuAsl && /association syndicale|\basl\b/i.test(sansAccent(R.organisations.unionOuAsl));
+  const lots = etat.lots.map(l => l.numero).filter(Boolean);
+  let t = (etat.interlocuteurs.nom ? etat.interlocuteurs.nom + ",\n\n" : "Madame, Monsieur,\n\n")
+    + "Dans le cadre de la vente " + (lots.length ? (lots.length > 1 ? "des lots " : "du lot ") + lots.join(", ") + " " : "") + "dépendant de la copropriété" + (etat.dossier ? " (dossier " + etat.dossier.nom + ")" : "") + ", nous vous remercions de bien vouloir nous communiquer :\n\n";
+  if(manquantes.length) t += manquantes.map(m => "- " + m + " ;").join("\n") + "\n\n";
+  t += "Nous vous remercions également de nous indiquer :\n\n"
+    + "1. si la copropriété est administrée par un syndic professionnel ou non professionnel et, dans ce second cas, comment elle est administrée au quotidien ;\n"
+    + "2. l'identité du syndic actuel ;\n"
+    + "3. la date de la dernière assemblée générale ou, à défaut, de la dernière réunion des copropriétaires, ainsi que les décisions prises, même en l'absence de procès-verbal formel ;\n"
+    + "4. les derniers appels et relevés de charges de copropriété ou, à défaut, tout document établissant la répartition des charges entre les copropriétaires ;\n"
+    + "5. si des travaux affectant les parties communes ou l'aspect extérieur de l'immeuble ont été réalisés dans le lot vendu et, dans l'affirmative, si une autorisation de l'assemblée générale a été obtenue.\n";
+  if(asl) t += "\nLa copropriété paraît dépendre d'une association syndicale libre. Nous vous remercions de nous préciser si celle-ci est toujours active, si des charges de l'association vous sont appelées, les coordonnées de son président, et de nous transmettre les procès-verbaux de ses trois dernières assemblées.\n";
+  return t + "\nBien cordialement,\n";
+}
+function preparerDemande(){
+  const corps = texteDemande();
+  const objet = "Copropriété — demande de pièces" + (etat.dossier ? " — " + etat.dossier.nom : "");
+  const lien = "mailto:" + encodeURIComponent(etat.interlocuteurs.courriel || "") + "?subject=" + encodeURIComponent(objet) + "&body=" + encodeURIComponent(corps);
+  if(lien.length > 1900){ navigator.clipboard && navigator.clipboard.writeText(corps); signaler("Texte long : il est copié, collez-le dans le courriel qui s'ouvre."); location.href = "mailto:" + encodeURIComponent(etat.interlocuteurs.courriel || "") + "?subject=" + encodeURIComponent(objet); }
+  else location.href = lien;
+}
+$("btn-demande").addEventListener("click", preparerDemande);
+document.addEventListener("click", e => { const b = e.target.closest("[data-sortie]"); if(b) produire(b.dataset.sortie); });
+
+/* ---------- rendu ---------- */
+function optionsTypes(sel){ return Object.keys(TYPES).map(k => '<option value="' + k + '"' + (k === sel ? " selected" : "") + ">" + esc(TYPES[k].libelle) + "</option>").join(""); }
+function rendre(){
+  // pièces, regroupées par type
+  const tp = $("table-pieces");
+  if(!etat.pieces.length){ tp.innerHTML = '<tr><td class="vide">Aucune pièce déposée.</td></tr>'; }
+  else{
+    let h = "<thead><tr><th>Pièce</th><th>Nature</th><th>Date</th><th>Qualification</th><th></th></tr></thead><tbody>";
+    for(const k of Object.keys(TYPES)){
+      const liste = etat.pieces.filter(p => p.type === k).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      if(!liste.length) continue;
+      h += '<tr class="famille"><td colspan="5">' + esc(TYPES[k].libelle) + " (" + liste.length + ")</td></tr>";
+      for(const p of liste){
+        const i = etat.pieces.indexOf(p);
+        const champDate = p.type === "PVAG" ? "dateAssemblee" : "date";
+        h += "<tr><td class=\"nom\" title=\"" + esc(p.nom) + "\"><a href=\"" + esc(p.lien) + "\" target=\"_blank\" rel=\"noopener\">" + esc(p.nom) + "</a></td>"
+          + '<td><select data-i="' + i + '" data-champ="type">' + optionsTypes(p.type) + "</select></td>"
+          + '<td><input type="date" data-i="' + i + '" data-champ="' + champDate + '" value="' + esc(p[champDate] || "") + '"></td>'
+          + '<td><span class="source' + (String(p.source).startsWith("claude") ? " claude" : "") + '">' + esc(p.source) + "</span></td>"
+          + "<td>" + (p.sansTexte ? '<button class="btn second petit" data-lire="' + i + '" type="button">Lire l\'image</button>' : "") + "</td></tr>";
+      }
+    }
+    tp.innerHTML = h + "</tbody>";
+  }
+  // lots
+  const tl = $("table-lots");
+  tl.innerHTML = etat.lots.length
+    ? "<thead><tr><th>Numéro de lot</th><th>Désignation</th><th></th></tr></thead><tbody>" + etat.lots.map((l, i) =>
+        '<tr><td><input type="text" data-lot="' + i + '" data-champ="numero" value="' + esc(l.numero) + '" style="width:110px"></td>'
+        + '<td><input type="text" data-lot="' + i + '" data-champ="designation" value="' + esc(l.designation) + '" style="width:100%" placeholder="appartement, cave, parking…"></td>'
+        + '<td><button class="btn second petit" data-retirer="' + i + '" type="button">Retirer</button></td></tr>').join("") + "</tbody>"
+    : '<tr><td class="vide">Aucun lot saisi.</td></tr>';
+  $("date-vente").value = etat.vente.date || "";
+  $("date-promesse").value = etat.vente.promesse || "";
+  $("interloc-nom").value = etat.interlocuteurs.nom || "";
+  $("interloc-courriel").value = etat.interlocuteurs.courriel || "";
+  $("origine-vente").textContent = etat.vente.origine ? "(" + etat.vente.origine + ")" : "";
+  // contrôles
+  const al = controles();
+  $("alertes").innerHTML = al.length ? al.map(x => '<div class="alerte ' + (x.c === "jaune" ? "" : x.c) + '">' + esc(x.t) + "</div>").join("") : '<div class="aucune">Aucune réserve.</div>';
+  const ag = etat.pieces.filter(p => p.type === "PVAG").sort((a, b) => String(b.dateAssemblee).localeCompare(String(a.dateAssemblee)));
+  $("table-ag").innerHTML = ag.length
+    ? "<thead><tr><th>Assemblée du</th><th>Notification du procès-verbal</th><th>Délai de contestation</th></tr></thead><tbody>" + ag.map(p => {
+        const i = etat.pieces.indexOf(p);
+        const s = p.dateAssemblee ? contestation(p) : {c:"inconnu", t:"Date d'assemblée à saisir"};
+        return "<tr><td>" + esc(frDepuisISO(p.dateAssemblee)) + '</td><td><input type="date" data-i="' + i + '" data-champ="notification" value="' + esc(p.notification || "") + '"></td><td class="statut ' + s.c + '">' + esc(s.t) + "</td></tr>";
+      }).join("") + "</tbody>"
+    : '<tr><td class="vide">Aucun procès-verbal déposé.</td></tr>';
+  rendreAnalyse();
+}
+
+/* ---------- événements ---------- */
+document.addEventListener("change", async e => {
+  const el = e.target;
+  if(el.dataset.i != null){
+    const p = etat.pieces[+el.dataset.i]; if(!p) return;
+    p[el.dataset.champ] = el.value || null;
+    if(el.dataset.champ === "dateAssemblee") p.date = p.dateAssemblee;
+    if(el.dataset.champ === "type" || el.dataset.champ === "date" || el.dataset.champ === "dateAssemblee"){
+      if(p.source === "à lire" || p.source === "code") p.source = "saisie";
+      await renommerSiBesoin(p);
+    }
+    rendre(); enregistrer();
+  }else if(el.dataset.lot != null){
+    etat.lots[+el.dataset.lot][el.dataset.champ] = el.value.trim(); rendre(); enregistrer();
+  }else if(el.id === "date-vente"){
+    etat.vente.date = el.value || null; etat.vente.origine = el.value ? "saisie" : null; rendre(); enregistrer();
+  }else if(el.id === "date-promesse"){
+    etat.vente.promesse = el.value || null; rendre(); enregistrer();
+  }else if(el.id === "interloc-nom" || el.id === "interloc-courriel"){
+    etat.interlocuteurs[el.id === "interloc-nom" ? "nom" : "courriel"] = el.value.trim(); enregistrer();
+  }
+});
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.lire != null) lireImage(etat.pieces[+b.dataset.lire]);
+  if(b.dataset.retirer != null){ etat.lots.splice(+b.dataset.retirer, 1); rendre(); enregistrer(); }
+});
+$("btn-drive").addEventListener("click", () => { if(etat.drive.client) etat.drive.client.requestAccessToken(); });
+$("btn-ouvrir").addEventListener("click", ouvrirDossier);
+$("champ-dossier").addEventListener("keydown", e => { if(e.key === "Enter") ouvrirDossier(); });
+$("btn-ajout-lot").addEventListener("click", () => { etat.lots.push({numero:"", designation:""}); rendre(); enregistrer(); });
+$("btn-chercher-vente").addEventListener("click", chercherVente);
+const depot = $("depot"), choix = $("choix-fichiers");
+depot.addEventListener("click", () => choix.click());
+depot.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); choix.click(); } });
+choix.addEventListener("change", () => { deposer([...choix.files]); choix.value = ""; });
+depot.addEventListener("dragover", e => { e.preventDefault(); depot.classList.add("survol"); });
+depot.addEventListener("dragleave", () => depot.classList.remove("survol"));
+depot.addEventListener("drop", e => { e.preventDefault(); depot.classList.remove("survol"); deposer([...e.dataTransfer.files].filter(f => /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name))); });
+
+// Ouverture directe par paramètre d'adresse : ?dossier=<identifiant ou lien Drive> (utile depuis FUSION au lot 3).
+const param = new URLSearchParams(location.search).get("dossier");
+if(param) $("champ-dossier").value = param;
+preparerOAuth();
+</script>
+</body>
+</html>
