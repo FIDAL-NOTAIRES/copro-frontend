@@ -596,29 +596,29 @@ function contestation(p){
    LOT 2 — analyse, voyant de vigilance, restitution à l'écran
    ============================================================ */
 
-// Les vingt zones ciblées du règlement (arrêtées le 25/09/2026).
+// Les vingt zones ciblées du règlement (arrêtées le 25/09/2026 ; mots de repérage complétés le 13/11/2026, propositions de Claude retenues par défaut par JFD).
 // Repérage par ARTICLE en principe (titre de l'article), par EXPRESSION par exception.
 const ZONES = [
-  {id:"z1",  libelle:"Parties communes et parties privatives", titre:/parties? (communes|privatives)/, expr:/parties? (communes|privatives)/},
-  {id:"z2",  libelle:"Répartition des charges et clés de répartition", titre:/repartition des charges|charges communes|cles? de repartition/, expr:/repartition des charges|cles? de repartition/},
-  {id:"z3",  libelle:"Destination de l'immeuble", titre:/destination/, expr:/destination de l.immeuble|immeuble (est )?destine/},
-  {id:"z4",  libelle:"Restrictions d'usage des lots", titre:/usage des (parties privatives|lots|appartements)|occupation/, expr:/exercice d.une profession|habitation bourgeoise|activite commerciale|usage (exclusif )?d.habitation/},
-  {id:"z5",  libelle:"Servitudes et droits de passage internes", titre:/servitude/, expr:/servitude|droit de passage/},
-  {id:"z6",  libelle:"Droits de jouissance exclusive", titre:/jouissance (exclusive|privative)/, expr:/jouissance (exclusive|privative)/},
-  {id:"z7",  libelle:"Cession et clause d'agrément", titre:/mutation|cession|alienation/, expr:/agrement|mutation|alienation/},
-  {id:"z8",  libelle:"Droit de préemption", titre:/preemption|preference/, expr:/preemption|droit de preference/},
-  {id:"z9",  libelle:"Règles de vote et majorités particulières", titre:/assemblee|majorite|vote|voix/, expr:/majorite|nombre de voix/},
-  {id:"z10", libelle:"Travaux sur les parties privatives", titre:/travaux|modification|harmonie/, expr:/(facade|aspect exterieur|harmonie de l.immeuble)/},
-  {id:"z11", libelle:"Syndicat secondaire ou division en bâtiments", titre:/syndicat secondaire|batiments?/, expr:/syndicat secondaire|par batiment/},
-  {id:"z12", libelle:"Union de syndicats ou ASL rattachée", titre:/union|association syndicale/, expr:/union de syndicats|association syndicale|\basl\b/},
-  {id:"z13", libelle:"Charges spéciales (ascenseur, chauffage) et lots exonérés", titre:/ascenseur|chauffage|charges speciales/, expr:/ascenseur|chauffage collectif|charges speciales/},
-  {id:"z14", libelle:"Solidarité et garantie des arriérés de charges", titre:/solidarit|indivisibilit/, expr:/solidarit|arriere/},
-  {id:"z15", libelle:"Assurance et répartition des sinistres", titre:/assurance|sinistre/, expr:/assurance|sinistre/},
-  {id:"z16", libelle:"Modification du règlement", titre:/modification du (present )?reglement|modifications?$/, expr:/modification du (present )?reglement|modifier le (present )?reglement/},
-  {id:"z17", libelle:"Tantièmes généraux et particuliers", titre:/tantiemes|milliemes|quotes?.parts?/, expr:/tantiemes|milliemes/},
-  {id:"z18", libelle:"Stationnements et leur régime", titre:/stationnement|parking|garage/, expr:/stationnement|parking|emplacement de voiture/},
-  {id:"z19", libelle:"Location (meublée, saisonnière)", titre:/location|bail/, expr:/location (meublee|saisonniere)|courte duree|meuble de tourisme/},
-  {id:"z20", libelle:"Dispositions transitoires ou particulières au promoteur", titre:/dispositions (transitoires|particulieres)|reserve/, expr:/(droits? reserves?|reserve).{0,40}(vendeur|constructeur|promoteur|societe venderesse)/}
+  {id:"z1",  libelle:"Parties communes et parties privatives", titre:/parties? (communes|privatives)|designation des parties|distinction des parties/, expr:/parties? (communes|privatives)/},
+  {id:"z2",  libelle:"Répartition des charges et clés de répartition", titre:/repartition des charges|charges communes|cles? de repartition|contribution aux charges|charges generales/, expr:/repartition des charges|cles? de repartition/},
+  {id:"z3",  libelle:"Destination de l'immeuble", titre:/destination/, expr:/destination de l.immeuble|immeuble (est )?destine|habitation bourgeoise/},
+  {id:"z4",  libelle:"Restrictions d'usage des lots", titre:/usage des (parties privatives|lots|appartements)|occupation|jouissance des parties privatives/, expr:/exercice d.une profession|habitation bourgeoise|activite commerciale|usage (exclusif )?d.habitation/},
+  {id:"z5",  libelle:"Servitudes et droits de passage internes", titre:/servitude/, expr:/servitude|droit de passage|tour d.echelle|droit de vue/},
+  {id:"z6",  libelle:"Droits de jouissance exclusive", titre:/jouissance (exclusive|privative)/, expr:/jouissance (exclusive|privative)|usage exclusif/},
+  {id:"z7",  libelle:"Cession et clause d'agrément", titre:/mutation|cession|alienation|agrement/, expr:/agrement|mutation|alienation|cession des lots/},
+  {id:"z8",  libelle:"Droit de préemption", titre:/preemption|preference/, expr:/preemption|droit de preference|droit de priorite/},
+  {id:"z9",  libelle:"Règles de vote et majorités particulières", titre:/assemblee|majorite|vote|voix/, expr:/majorite|nombre de voix|unanimite/},
+  {id:"z10", libelle:"Travaux sur les parties privatives", titre:/travaux|modification|harmonie|aspect exterieur/, expr:/facade|aspect exterieur|harmonie de l.immeuble|fenetres|volets|climatis|veranda/},
+  {id:"z11", libelle:"Syndicat secondaire ou division en bâtiments", titre:/syndicat secondaire|batiments?/, expr:/syndicat secondaire|par batiment|parties communes speciales/},
+  {id:"z12", libelle:"Union de syndicats ou ASL rattachée", titre:/union|association syndicale/, expr:/union de syndicats|association syndicale|\basl\b|association fonciere urbaine|\bafu\b/},
+  {id:"z13", libelle:"Charges spéciales (ascenseur, chauffage) et lots exonérés", titre:/ascenseur|chauffage|charges speciales/, expr:/ascenseur|chauffage collectif|charges speciales|dispense|exonere/},
+  {id:"z14", libelle:"Solidarité et garantie des arriérés de charges", titre:/solidarit|indivisibilit/, expr:/solidarit|arriere|privilege du syndicat/},
+  {id:"z15", libelle:"Assurance et répartition des sinistres", titre:/assurance|sinistre/, expr:/assurance|sinistre|reconstruction/},
+  {id:"z16", libelle:"Modification du règlement", titre:/modification du (present )?reglement|modifications?$/, expr:/modification du (present )?reglement|modifier le (present )?reglement|modificatif/},
+  {id:"z17", libelle:"Tantièmes généraux et particuliers", titre:/tantiemes|milliemes|quotes?.parts?/, expr:/tantiemes|milliemes|quotes?.parts? de(s)? parties communes/},
+  {id:"z18", libelle:"Stationnements et leur régime", titre:/stationnement|parking|garage/, expr:/stationnement|parking|emplacement de voiture|\bbox\b|aire de stationnement/},
+  {id:"z19", libelle:"Location (meublée, saisonnière)", titre:/location|bail/, expr:/location (meublee|saisonniere|touristique)|courte duree|meuble de tourisme/},
+  {id:"z20", libelle:"Dispositions transitoires ou particulières au promoteur", titre:/dispositions (transitoires|particulieres)|reserve|droits du constructeur/, expr:/(droits? reserves?|reserve).{0,40}(vendeur|constructeur|promoteur|societe venderesse)|droit de surelever|surelevation/}
 ];
 const ANS_PREMIER_PLAN = 3;
 const NATURE_FIN = ["AF","EDA","IMP","BUD","FSC"];
